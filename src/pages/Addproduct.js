@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { React, useEffect, useState, useCallback } from "react";
 import CustomInput from "../components/CustomInput";
 import ReactQuill from "react-quill";
@@ -40,7 +41,6 @@ const Addproduct = () => {
   const getProductId = location.pathname.split("/")[3];
   const navigate = useNavigate();
   const [color, setColor] = useState([]);
-  const [images, setImages] = useState([]);
   console.log(color);
   
   const loadData = useCallback(() => {

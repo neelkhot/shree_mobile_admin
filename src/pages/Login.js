@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import CustomInput from "../components/CustomInput";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,15 +28,13 @@ const Login = () => {
   });
   const authState = useSelector((state) => state);
 
-  const { user, isError, isSuccess, isLoading, message } = authState.auth;
+  const { isSuccess, message } = authState.auth;
 
   useEffect(() => {
     if (isSuccess) {
-      window.location.href = "/admin";
-    } else {
-      navigate("");
+      navigate("/admin");
     }
-  }, [user, isError, isSuccess, isLoading]);
+  }, [isSuccess, navigate]);
   return (
     <div className="py-5" style={{ background: "#ffd333", minHeight: "100vh" }}>
       <br />
@@ -48,7 +46,7 @@ const Login = () => {
         <h3 className="text-center title">Login</h3>
         <p className="text-center">Login to your account to continue.</p>
         <div className="error text-center">
-          {message.message == "Rejected" ? "You are not an Admin" : ""}
+          {message.message === "Rejected" ? "You are not an Admin" : ""}
         </div>
         <form action="" onSubmit={formik.handleSubmit}>
           <CustomInput
