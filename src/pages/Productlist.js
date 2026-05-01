@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Table } from "antd";
 import { BiEdit } from "react-icons/bi";
 import { AiFillDelete } from "react-icons/ai";
@@ -55,9 +55,14 @@ const Productlist = () => {
     setOpen(false);
   };
   const dispatch = useDispatch();
-  useEffect(() => {
+  
+  const loadProducts = useCallback(() => {
     dispatch(getProducts());
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
   const productState = useSelector((state) => state?.product?.products);
   const data1 = [];
   for (let i = 0; i < productState.length; i++) {

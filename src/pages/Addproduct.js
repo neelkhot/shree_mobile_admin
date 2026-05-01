@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect, useState, useCallback } from "react";
 import CustomInput from "../components/CustomInput";
 import ReactQuill from "react-quill";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ import {
   resetState,
   updateAProduct,
 } from "../features/product/productSlice";
+
 let schema = yup.object().shape({
   title: yup.string().required("Title is Required"),
   description: yup.string().required("Description is Required"),
@@ -41,11 +42,16 @@ const Addproduct = () => {
   const [color, setColor] = useState([]);
   const [images, setImages] = useState([]);
   console.log(color);
-  useEffect(() => {
+  
+  const loadData = useCallback(() => {
     dispatch(getBrands());
     dispatch(getCategories());
     dispatch(getColors());
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const brandState = useSelector((state) => state.brand.brands);
   const catState = useSelector((state) => state.pCategory.pCategories);

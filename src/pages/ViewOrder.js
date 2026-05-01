@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { BiEdit } from "react-icons/bi";
-import { AiFillDelete } from "react-icons/ai";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getaOrder } from "../features/auth/authSlice";
 const columns = [
   {
@@ -36,9 +34,14 @@ const ViewOrder = () => {
   const location = useLocation();
   const orderId = location.pathname.split("/")[3];
   const dispatch = useDispatch();
-  useEffect(() => {
+
+  const loadOrder = useCallback(() => {
     dispatch(getaOrder(orderId));
-  }, []);
+  }, [dispatch, orderId]);
+
+  useEffect(() => {
+    loadOrder();
+  }, [loadOrder]);
   const orderState = useSelector((state) => state?.auth?.singleorder?.orders);
   console.log(orderState);
   const data1 = [];

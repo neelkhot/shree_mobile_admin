@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -16,9 +16,13 @@ const ViewEnq = () => {
   const enqState = useSelector((state) => state.enquiry);
   const { enqName, enqMobile, enqEmail, enqComment, enqStatus } = enqState;
 
-  useEffect(() => {
+  const loadEnquiry = useCallback(() => {
     dispatch(getAEnquiry(getEnqId));
-  }, [getEnqId]);
+  }, [dispatch, getEnqId]);
+
+  useEffect(() => {
+    loadEnquiry();
+  }, [loadEnquiry]);
   const goBack = () => {
     navigate(-1);
   };
