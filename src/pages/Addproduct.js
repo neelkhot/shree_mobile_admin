@@ -110,7 +110,7 @@ const Addproduct = () => {
       value: i._id,
     });
   });
-
+//asdfasdfsdfsdf
   const productcolor = [];
   productColors?.forEach((i) => {
     productcolor.push({
