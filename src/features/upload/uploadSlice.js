@@ -56,7 +56,15 @@ const initialState = {
 export const uploadSlice = createSlice({
   name: "imaegs",
   initialState,
-  reducers: {},
+  reducers: {
+    resetImages: (state) => {
+      state.images = [];
+      state.isError = false;
+      state.isLoading = false;
+      state.isSuccess = false;
+      state.message = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(uploadImg.pending, (state) => {
@@ -66,7 +74,7 @@ export const uploadSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.images = action.payload;
+        state.images = [...state.images, ...(action.payload || [])];
       })
       .addCase(uploadImg.rejected, (state, action) => {
         state.isLoading = false;
@@ -81,7 +89,9 @@ export const uploadSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.images = [];
+        state.images = state.images.filter(
+          (image) => image.public_id !== action.meta.arg
+        );
       })
       .addCase(delImg.rejected, (state, action) => {
         state.isLoading = false;
@@ -91,4 +101,5 @@ export const uploadSlice = createSlice({
       });
   },
 });
+export const { resetImages } = uploadSlice.actions;
 export default uploadSlice.reducer;

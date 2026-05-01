@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { React, useEffect, useState, useCallback } from "react";
+import { React, useEffect, useState, useCallback, useMemo } from "react";
 import CustomInput from "../components/CustomInput";
 import ReactQuill from "react-quill";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -13,7 +13,7 @@ import { getCategories } from "../features/pcategory/pcategorySlice";
 import { getColors } from "../features/color/colorSlice";
 import { Select } from "antd";
 import Dropzone from "react-dropzone";
-import { delImg, uploadImg } from "../features/upload/uploadSlice";
+import { delImg, resetImages, uploadImg } from "../features/upload/uploadSlice";
 import {
   createProducts,
   getAProduct,
@@ -41,6 +41,7 @@ const Addproduct = () => {
   const getProductId = location.pathname.split("/")[3];
   const navigate = useNavigate();
   const [color, setColor] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
   console.log(color);
   
   const loadData = useCallback(() => {
@@ -80,8 +81,13 @@ const Addproduct = () => {
       dispatch(getAProduct(getProductId));
     } else {
       dispatch(resetState());
+      dispatch(resetImages());
     }
   }, [getProductId]);
+
+  useEffect(() => {
+    setExistingImages(productImages || []);
+  }, [productImages]);
   useEffect(() => {
     if (isSuccess && createdProduct) {
       toast.success("Product Added Successfullly!");
@@ -140,26 +146,22 @@ const Addproduct = () => {
     });
   });
 
-  const img = [];
-  imgState?.forEach((i) => {
-    img.push({
+  const img = useMemo(() => {
+    return imgState?.map((i) => ({
       public_id: i.public_id,
       url: i.url,
-    });
-  });
+    })) || [];
+  }, [imgState]);
 
-  const imgshow = [];
-  productImages?.forEach((i) => {
-    imgshow.push({
-      public_id: i.public_id,
-      url: i.url,
-    });
-  });
+  const allProductImages = useMemo(() => {
+    return [...existingImages, ...img];
+  }, [existingImages, img]);
 
   useEffect(() => {
-    formik.values.color = color ? color : " ";
-    formik.values.images = img;
-  }, [color, img]);
+    formik.setFieldValue("color", color ? color : []);
+    formik.setFieldValue("images", allProductImages);
+  }, [color, allProductImages]);
+
   const formik = useFormik({
     initialValues: {
       title: productName || "",
@@ -170,7 +172,7 @@ const Addproduct = () => {
       tags: productTag || "",
       color: productColors || "",
       quantity: productQuantity || "",
-      images: productImages || "",
+      images: productImages || [],
     },
     validationSchema: schema,
     onSubmit: (values) => {
@@ -182,6 +184,7 @@ const Addproduct = () => {
         dispatch(createProducts(values));
         formik.resetForm();
         setColor(null);
+        dispatch(resetImages());
         setTimeout(() => {
           dispatch(resetState());
         }, 3000);
@@ -191,6 +194,15 @@ const Addproduct = () => {
   const handleColors = (e) => {
     setColor(e);
     console.log(color);
+  };
+
+  const handleDeleteImage = (publicId, isExisting = false) => {
+    dispatch(delImg(publicId));
+    if (isExisting) {
+      setExistingImages((images) =>
+        images.filter((image) => image.public_id !== publicId)
+      );
+    }
   };
 
   return (
@@ -320,6 +332,8 @@ const Addproduct = () => {
           </div>
           <div className="bg-white border-1 p-5 text-center">
             <Dropzone
+              multiple
+              maxFiles={10}
               onDrop={(acceptedFiles) => dispatch(uploadImg(acceptedFiles))}
             >
               {({ getRootProps, getInputProps }) => (
@@ -327,20 +341,23 @@ const Addproduct = () => {
                   <div {...getRootProps()}>
                     <input {...getInputProps()} />
                     <p>
-                      Drag 'n' drop some files here, or click to select files
+                      Drag 'n' drop product images here, or click to select multiple files
                     </p>
+                    <small className="text-muted">
+                      You can upload up to 10 images per product.
+                    </small>
                   </div>
                 </section>
               )}
             </Dropzone>
           </div>
           <div className="showimages d-flex flex-wrap gap-3">
-            {imgshow?.map((i, j) => {
+            {existingImages?.map((i, j) => {
               return (
                 <div className=" position-relative" key={j}>
                   <button
                     type="button"
-                    onClick={() => dispatch(delImg(i.public_id))}
+                    onClick={() => handleDeleteImage(i.public_id, true)}
                     className="btn-close position-absolute"
                     style={{ top: "10px", right: "10px" }}
                   ></button>
@@ -353,7 +370,7 @@ const Addproduct = () => {
                 <div className=" position-relative" key={j}>
                   <button
                     type="button"
-                    onClick={() => dispatch(delImg(i.public_id))}
+                    onClick={() => handleDeleteImage(i.public_id)}
                     className="btn-close position-absolute"
                     style={{ top: "10px", right: "10px" }}
                   ></button>
