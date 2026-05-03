@@ -7,6 +7,7 @@ import pCategoryReducer from "../features/pcategory/pcategorySlice";
 import bCategoryReducer from "../features/bcategory/bcategorySlice";
 import blogReducer from "../features/blogs/blogSlice";
 import colorReducer from "../features/color/colorSlice";
+import sizeReducer from "../features/size/sizeSlice";
 import enquiryReducer from "../features/enquiry/enquirySlice";
 import uploadReducer from "../features/upload/uploadSlice";
 import couponReducer from "../features/coupon/couponSlice";
@@ -20,6 +21,7 @@ export const store = configureStore({
     bCategory: bCategoryReducer,
     blogs: blogReducer,
     color: colorReducer,
+    size: sizeReducer,
     enquiry: enquiryReducer,
     upload: uploadReducer,
     coupon: couponReducer,

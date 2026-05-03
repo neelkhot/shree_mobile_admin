@@ -25,6 +25,10 @@ const columns = [
     dataIndex: "color",
   },
   {
+    title: "Size",
+    dataIndex: "size",
+  },
+  {
     title: "Amount",
     dataIndex: "amount",
   },
@@ -67,6 +71,7 @@ const ViewOrder = () => {
           ></ul>
         </div>
       ),
+      size: orderState?.orderItems[i]?.size?.title || "-",
     });
   }
   return (

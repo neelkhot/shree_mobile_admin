@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getBrands } from "../features/brand/brandSlice";
 import { getCategories } from "../features/pcategory/pcategorySlice";
 import { getColors } from "../features/color/colorSlice";
+import { getSizes } from "../features/size/sizeSlice";
 import { Select } from "antd";
 import Dropzone from "react-dropzone";
 import { delImg, resetImages, uploadImg } from "../features/upload/uploadSlice";
@@ -32,6 +33,10 @@ let schema = yup.object().shape({
     .array()
     .min(1, "Pick at least one color")
     .required("Color is Required"),
+  size: yup
+    .array()
+    .min(1, "Pick at least one size")
+    .required("Size is Required"),
   quantity: yup.number().required("Quantity is Required"),
 });
 
@@ -41,6 +46,7 @@ const Addproduct = () => {
   const getProductId = location.pathname.split("/")[3];
   const navigate = useNavigate();
   const [color, setColor] = useState([]);
+  const [size, setSize] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   console.log(color);
   
@@ -48,6 +54,7 @@ const Addproduct = () => {
     dispatch(getBrands());
     dispatch(getCategories());
     dispatch(getColors());
+    dispatch(getSizes());
   }, [dispatch]);
 
   useEffect(() => {
@@ -57,6 +64,7 @@ const Addproduct = () => {
   const brandState = useSelector((state) => state.brand.brands);
   const catState = useSelector((state) => state.pCategory.pCategories);
   const colorState = useSelector((state) => state.color.colors);
+  const sizeState = useSelector((state) => state.size.sizes);
   const imgState = useSelector((state) => state?.upload?.images);
   const newProduct = useSelector((state) => state.product);
   const {
@@ -72,6 +80,7 @@ const Addproduct = () => {
     productCategory,
     productTag,
     productColors,
+    productSizes,
     productQuantity,
     productImages,
   } = newProduct;
@@ -122,30 +131,13 @@ const Addproduct = () => {
       value: i._id,
     });
   });
-//asdfasdfsdfsdf
-  const productcolor = [];
-  productColors?.forEach((i) => {
-    productcolor.push({
-      label: (
-        <div className="col-3">
-          <ul
-            className="colors ps-0"
-            style={{
-              width: "20px",
-              height: "20px",
-              marginBottom: "10px",
-              backgroundColor: i.title,
-              borderRadius: "50%", // Added inline style for rounded shape
-              listStyle: "none", // Hide bullet points
-              border: "2px solid transparent",
-            }}
-          ></ul>
-        </div>
-      ),
+  const sizeopt = [];
+  sizeState.forEach((i) => {
+    sizeopt.push({
+      label: i.title,
       value: i._id,
     });
   });
-
   const img = useMemo(() => {
     return imgState?.map((i) => ({
       public_id: i.public_id,
@@ -159,10 +151,19 @@ const Addproduct = () => {
 
   useEffect(() => {
     formik.setFieldValue("color", color ? color : []);
+    formik.setFieldValue("size", size ? size : []);
     formik.setFieldValue("images", allProductImages);
-  }, [color, allProductImages]);
+  }, [color, size, allProductImages]);
+
+  useEffect(() => {
+    if (getProductId !== undefined) {
+      setColor(productColors?.map((item) => item._id) || []);
+      setSize(productSizes?.map((item) => item._id) || []);
+    }
+  }, [getProductId, productColors, productSizes]);
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       title: productName || "",
       description: productDesc || "",
@@ -171,6 +172,7 @@ const Addproduct = () => {
       category: productCategory || "",
       tags: productTag || "",
       color: productColors || "",
+      size: productSizes || "",
       quantity: productQuantity || "",
       images: productImages || [],
     },
@@ -183,7 +185,8 @@ const Addproduct = () => {
       } else {
         dispatch(createProducts(values));
         formik.resetForm();
-        setColor(null);
+        setColor([]);
+        setSize([]);
         dispatch(resetImages());
         setTimeout(() => {
           dispatch(resetState());
@@ -194,6 +197,9 @@ const Addproduct = () => {
   const handleColors = (e) => {
     setColor(e);
     console.log(color);
+  };
+  const handleSizes = (e) => {
+    setSize(e);
   };
 
   const handleDeleteImage = (publicId, isExisting = false) => {
@@ -312,12 +318,24 @@ const Addproduct = () => {
             allowClear
             className="w-100"
             placeholder="Select colors"
-            defaultValue={productcolor || color}
+            value={color}
             onChange={(i) => handleColors(i)}
             options={coloropt}
           />
           <div className="error">
             {formik.touched.color && formik.errors.color}
+          </div>
+          <Select
+            mode="multiple"
+            allowClear
+            className="w-100"
+            placeholder="Select sizes"
+            value={size}
+            onChange={(i) => handleSizes(i)}
+            options={sizeopt}
+          />
+          <div className="error">
+            {formik.touched.size && formik.errors.size}
           </div>
           <CustomInput
             type="number"

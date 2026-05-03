@@ -10,12 +10,14 @@ import Blogcatlist from "./pages/Blogcatlist";
 import Orders from "./pages/Orders";
 import Customers from "./pages/Customers";
 import Colorlist from "./pages/Colotlist";
+import Sizelist from "./pages/Sizelist";
 import Categorylist from "./pages/Categorylist";
 import Brandlist from "./pages/Brandlist";
 import Productlist from "./pages/Productlist";
 import Addblog from "./pages/Addblog";
 import Addblogcat from "./pages/Addblogcat";
 import Addcolor from "./pages/Addcolor";
+import Addsize from "./pages/Addsize";
 import Addcat from "./pages/Addcat";
 import Addbrand from "./pages/Addbrand";
 import Addproduct from "./pages/Addproduct";
@@ -65,6 +67,9 @@ function App() {
           <Route path="list-color" element={<Colorlist />} />
           <Route path="color" element={<Addcolor />} />
           <Route path="color/:id" element={<Addcolor />} />
+          <Route path="list-size" element={<Sizelist />} />
+          <Route path="size" element={<Addsize />} />
+          <Route path="size/:id" element={<Addsize />} />
           <Route path="list-category" element={<Categorylist />} />
           <Route path="category" element={<Addcat />} />
           <Route path="category/:id" element={<Addcat />} />

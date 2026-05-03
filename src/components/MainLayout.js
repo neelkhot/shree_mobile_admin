@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { ImBlog } from "react-icons/im";
 import { FaClipboardList, FaBloggerB } from "react-icons/fa";
+import { FaRulerCombined } from "react-icons/fa";
 import { SiBrandfolder } from "react-icons/si";
 import { BiCategoryAlt } from "react-icons/bi";
 import { Layout, Menu, theme } from "antd";
@@ -102,6 +103,16 @@ const MainLayout = () => {
                   key: "list-color",
                   icon: <AiOutlineBgColors className="fs-4" />,
                   label: "Color List",
+                },
+                {
+                  key: "size",
+                  icon: <FaRulerCombined className="fs-4" />,
+                  label: "Size",
+                },
+                {
+                  key: "list-size",
+                  icon: <FaRulerCombined className="fs-4" />,
+                  label: "Size List",
                 },
               ],
             },
