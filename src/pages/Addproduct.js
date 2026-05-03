@@ -308,6 +308,7 @@ const Addproduct = () => {
             <option value="featured">Featured</option>
             <option value="popular">Popular</option>
             <option value="special">Special</option>
+            <option value="new-arrival">New Arrival</option>
           </select>
           <div className="error">
             {formik.touched.tags && formik.errors.tags}
