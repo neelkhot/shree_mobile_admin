@@ -28,7 +28,10 @@ let schema = yup.object().shape({
   price: yup.number().required("Price is Required"),
   brand: yup.string().required("Brand is Required"),
   category: yup.string().required("Category is Required"),
-  tags: yup.string().required("Tag is Required"),
+  tags: yup
+    .array()
+    .min(1, "Pick at least one tag")
+    .required("Tag is Required"),
   color: yup
     .array()
     .min(1, "Pick at least one color")
@@ -138,6 +141,12 @@ const Addproduct = () => {
       value: i._id,
     });
   });
+  const tagOptions = [
+    { label: "Featured", value: "featured" },
+    { label: "Popular", value: "popular" },
+    { label: "Special", value: "special" },
+    { label: "New Arrival", value: "new-arrival" },
+  ];
   const img = useMemo(() => {
     return imgState?.map((i) => ({
       public_id: i.public_id,
@@ -170,7 +179,11 @@ const Addproduct = () => {
       price: productPrice || "",
       brand: productBrand || "",
       category: productCategory || "",
-      tags: productTag || "",
+      tags: Array.isArray(productTag)
+        ? productTag
+        : productTag
+        ? [productTag]
+        : [],
       color: productColors || "",
       size: productSizes || "",
       quantity: productQuantity || "",
@@ -294,22 +307,16 @@ const Addproduct = () => {
           <div className="error">
             {formik.touched.category && formik.errors.category}
           </div>
-          <select
-            name="tags"
-            onChange={formik.handleChange("tags")}
-            onBlur={formik.handleBlur("tags")}
+          <Select
+            mode="multiple"
+            allowClear
+            className="w-100"
+            placeholder="Select tags"
             value={formik.values.tags}
-            className="form-control py-3 mb-3"
-            id=""
-          >
-            <option value="" disabled>
-              Select Category
-            </option>
-            <option value="featured">Featured</option>
-            <option value="popular">Popular</option>
-            <option value="special">Special</option>
-            <option value="new-arrival">New Arrival</option>
-          </select>
+            onChange={(value) => formik.setFieldValue("tags", value)}
+            onBlur={() => formik.setFieldTouched("tags", true)}
+            options={tagOptions}
+          />
           <div className="error">
             {formik.touched.tags && formik.errors.tags}
           </div>
