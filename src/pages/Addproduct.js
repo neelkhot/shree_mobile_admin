@@ -51,7 +51,7 @@ const Addproduct = () => {
   const [color, setColor] = useState([]);
   const [size, setSize] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
-  console.log(color);
+  const [imageColors, setImageColors] = useState({});
   
   const loadData = useCallback(() => {
     dispatch(getBrands());
@@ -99,6 +99,15 @@ const Addproduct = () => {
 
   useEffect(() => {
     setExistingImages(productImages || []);
+    setImageColors(
+      (productImages || []).reduce((colorsByImage, image) => {
+        if (image?.public_id && image?.color) {
+          colorsByImage[image.public_id] =
+            typeof image.color === "object" ? image.color?._id : image.color;
+        }
+        return colorsByImage;
+      }, {})
+    );
   }, [productImages]);
   useEffect(() => {
     if (isSuccess && createdProduct) {
@@ -151,12 +160,16 @@ const Addproduct = () => {
     return imgState?.map((i) => ({
       public_id: i.public_id,
       url: i.url,
+      color: imageColors[i.public_id] || null,
     })) || [];
-  }, [imgState]);
+  }, [imgState, imageColors]);
 
   const allProductImages = useMemo(() => {
-    return [...existingImages, ...img];
-  }, [existingImages, img]);
+    return [...existingImages, ...img].map((image) => ({
+      ...image,
+      color: imageColors[image.public_id] || image.color || null,
+    }));
+  }, [existingImages, imageColors, img]);
 
   useEffect(() => {
     formik.setFieldValue("color", color ? color : []);
@@ -191,7 +204,6 @@ const Addproduct = () => {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      console.log(values);
       if (getProductId !== undefined) {
         const data = { id: getProductId, productData: values };
         dispatch(updateAProduct(data));
@@ -209,7 +221,6 @@ const Addproduct = () => {
   });
   const handleColors = (e) => {
     setColor(e);
-    console.log(color);
   };
   const handleSizes = (e) => {
     setSize(e);
@@ -217,11 +228,23 @@ const Addproduct = () => {
 
   const handleDeleteImage = (publicId, isExisting = false) => {
     dispatch(delImg(publicId));
+    setImageColors((current) => {
+      const next = { ...current };
+      delete next[publicId];
+      return next;
+    });
     if (isExisting) {
       setExistingImages((images) =>
         images.filter((image) => image.public_id !== publicId)
       );
     }
+  };
+
+  const handleImageColorChange = (publicId, colorId) => {
+    setImageColors((current) => ({
+      ...current,
+      [publicId]: colorId || null,
+    }));
   };
 
   return (
@@ -388,6 +411,20 @@ const Addproduct = () => {
                     style={{ top: "10px", right: "10px" }}
                   ></button>
                   <img src={i.url} alt="" width={200} height={200} />
+                  <select
+                    className="form-control mt-2"
+                    value={imageColors[i.public_id] || ""}
+                    onChange={(event) =>
+                      handleImageColorChange(i.public_id, event.target.value)
+                    }
+                  >
+                    <option value="">Link image to color</option>
+                    {colorState.map((colorItem) => (
+                      <option key={colorItem._id} value={colorItem._id}>
+                        {colorItem.title}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               );
             })}
@@ -401,6 +438,20 @@ const Addproduct = () => {
                     style={{ top: "10px", right: "10px" }}
                   ></button>
                   <img src={i.url} alt="" width={200} height={200} />
+                  <select
+                    className="form-control mt-2"
+                    value={imageColors[i.public_id] || ""}
+                    onChange={(event) =>
+                      handleImageColorChange(i.public_id, event.target.value)
+                    }
+                  >
+                    <option value="">Link image to color</option>
+                    {colorState.map((colorItem) => (
+                      <option key={colorItem._id} value={colorItem._id}>
+                        {colorItem.title}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               );
             })}
