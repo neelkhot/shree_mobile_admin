@@ -8,6 +8,7 @@ import {
   getOrders,
   getYearlyData,
 } from "../features/auth/authSlice";
+import { getAuthConfig } from "../utils/axiosconfig";
 
 const columns = [
   {
@@ -42,30 +43,17 @@ const Dashboard = () => {
   const monthlyDataState = useSelector((state) => state?.auth?.monthlyData);
   const yearlyDataState = useSelector((state) => state?.auth?.yearlyData);
   const orderState = useSelector((state) => state?.auth?.orders?.orders);
-  console.log(orderState);
 
   const [dataMonthly, setDataMonthly] = useState([]);
   const [dataMonthlySales, setDataMonthlySales] = useState([]);
   const [orderData, setOrderData] = useState([]);
 
-  const getTokenFromLocalStorage = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user"))
-    : null;
-
-  const config3 = {
-    headers: {
-      Authorization: `Bearer ${
-        getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
-      }`,
-      Accept: "application/json",
-    },
-  };
-
   useEffect(() => {
+    const config3 = getAuthConfig();
     dispatch(getMonthlyData(config3));
     dispatch(getYearlyData(config3));
-    dispatch(getOrders(config3));
-  }, []);
+    dispatch(getOrders({ ...config3, params: { limit: 25 } }));
+  }, [dispatch]);
 
   useEffect(() => {
     let monthNames = [
@@ -113,7 +101,7 @@ const Dashboard = () => {
       });
     }
     setOrderData(data1);
-  }, [monthlyDataState, yearlyDataState]);
+  }, [monthlyDataState, yearlyDataState, orderState]);
 
   const config = {
     data: dataMonthly,

@@ -8,7 +8,7 @@ const Orders = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getOrders());
+    dispatch(getOrders({ params: { limit: 100 } }));
   }, [dispatch]);
 
   const orderState = useSelector((state) => state?.auth?.orders?.orders);

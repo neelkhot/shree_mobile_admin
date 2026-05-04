@@ -57,7 +57,14 @@ const Productlist = () => {
   const dispatch = useDispatch();
   
   const loadProducts = useCallback(() => {
-    dispatch(getProducts());
+    dispatch(
+      getProducts({
+        params: {
+          limit: 200,
+          fields: "title,brand,category,quantity,price,createdAt",
+        },
+      })
+    );
   }, [dispatch]);
 
   useEffect(() => {
@@ -98,10 +105,9 @@ const Productlist = () => {
 
     setOpen(false);
     setTimeout(() => {
-      dispatch(getProducts());
+      loadProducts();
     }, 100);
   };
-  console.log(data1);
   return (
     <div>
       <h3 className="mb-4 title">Products</h3>

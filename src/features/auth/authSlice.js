@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "./authServices";
 import { toast } from "react-toastify";
+import { getStoredUser } from "../../utils/axiosconfig";
 
 const getUserfromLocalStorage = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
+  ? getStoredUser()
   : null;
 const initialState = {
   user: getUserfromLocalStorage,
@@ -19,7 +20,9 @@ export const login = createAsyncThunk(
     try {
       return await authService.login(userData);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return thunkAPI.rejectWithValue(
+        error.response?.data || { message: error.message || "Login failed" }
+      );
     }
   }
 );
@@ -97,7 +100,7 @@ export const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.isError = true;
         state.isSuccess = false;
-        state.message = action.error;
+        state.message = action.payload?.message || action.error?.message || "Login failed";
         state.isLoading = false;
       })
       .addCase(getOrders.pending, (state) => {

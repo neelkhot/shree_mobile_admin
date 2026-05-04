@@ -28,7 +28,7 @@ const Login = () => {
   });
   const authState = useSelector((state) => state);
 
-  const { isSuccess, message } = authState.auth;
+  const { isSuccess, message, isLoading, isError } = authState.auth;
 
   useEffect(() => {
     if (isSuccess) {
@@ -46,7 +46,7 @@ const Login = () => {
         <h3 className="text-center title">Login</h3>
         <p className="text-center">Login to your account to continue.</p>
         <div className="error text-center">
-          {message.message === "Rejected" ? "You are not an Admin" : ""}
+          {isError ? message || "Unable to login" : ""}
         </div>
         <form action="" onSubmit={formik.handleSubmit}>
           <CustomInput
@@ -78,8 +78,9 @@ const Login = () => {
             className="border-0 px-3 py-2 text-white fw-bold w-100 text-center text-decoration-none fs-5"
             style={{ background: "#ffd333" }}
             type="submit"
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

@@ -47,7 +47,6 @@ const ViewOrder = () => {
     loadOrder();
   }, [loadOrder]);
   const orderState = useSelector((state) => state?.auth?.singleorder?.orders);
-  console.log(orderState);
   const data1 = [];
   for (let i = 0; i < orderState?.orderItems?.length; i++) {
     data1.push({
