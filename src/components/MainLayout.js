@@ -42,8 +42,8 @@ const MainLayout = () => {
           defaultSelectedKeys={[""]}
           onClick={({ key }) => {
             if (key === "signout") {
-              localStorage.clear();
-              window.location.reload();
+              localStorage.removeItem("user");
+              navigate("/", { replace: true });
             } else {
               navigate(key);
             }

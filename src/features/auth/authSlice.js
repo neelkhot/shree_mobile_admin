@@ -43,7 +43,9 @@ export const getaOrder = createAsyncThunk(
     try {
       return await authService.getOrder(id);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+      return thunkAPI.rejectWithValue(
+        error.response?.data || { message: error.message || "Unable to load order" }
+      );
     }
   }
 );
@@ -139,6 +141,8 @@ export const authSlice = createSlice({
       })
       .addCase(getaOrder.pending, (state) => {
         state.isLoading = true;
+        state.isError = false;
+        state.message = "";
       })
       .addCase(getaOrder.fulfilled, (state, action) => {
         state.isError = false;
@@ -150,7 +154,7 @@ export const authSlice = createSlice({
       .addCase(getaOrder.rejected, (state, action) => {
         state.isError = true;
         state.isSuccess = false;
-        state.message = action.error;
+        state.message = action.payload?.message || action.error?.message || "Unable to load order";
         state.isLoading = false;
       })
       .addCase(getMonthlyData.pending, (state) => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from "react";
 import { Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getaOrder } from "../features/auth/authSlice";
 const columns = [
   {
@@ -35,26 +35,29 @@ const columns = [
 ];
 
 const ViewOrder = () => {
-  const location = useLocation();
-  const orderId = location.pathname.split("/")[3];
+  const { id: orderId } = useParams();
   const dispatch = useDispatch();
+  const { singleorder, isLoading, isError, message } = useSelector(
+    (state) => state?.auth
+  );
 
   const loadOrder = useCallback(() => {
-    dispatch(getaOrder(orderId));
+    if (orderId) {
+      dispatch(getaOrder(orderId));
+    }
   }, [dispatch, orderId]);
 
   useEffect(() => {
     loadOrder();
   }, [loadOrder]);
-  const orderState = useSelector((state) => state?.auth?.singleorder?.orders);
-  const data1 = [];
-  for (let i = 0; i < orderState?.orderItems?.length; i++) {
-    data1.push({
-      key: i + 1,
-      name: orderState?.orderItems[i]?.product?.title,
-      brand: orderState?.orderItems[i]?.product?.brand,
-      count: orderState?.orderItems[i]?.quantity,
-      amount: orderState?.orderItems[i]?.price,
+
+  const orderState = singleorder?.orders;
+  const data1 = (orderState?.orderItems || []).map((item, index) => ({
+      key: index + 1,
+      name: item?.product?.title || "Product unavailable",
+      brand: item?.product?.brand || "-",
+      count: item?.quantity,
+      amount: item?.price,
       color: (
         <div className="col-3">
           <ul
@@ -65,19 +68,29 @@ const ViewOrder = () => {
               borderRadius: "50%",
               marginBottom: "10px",
 
-              backgroundColor: orderState?.orderItems[i]?.color?.title,
+              backgroundColor: item?.color?.title || "#ddd",
             }}
           ></ul>
         </div>
       ),
-      size: orderState?.orderItems[i]?.size?.title || "-",
-    });
-  }
+      size: item?.size?.title || "-",
+    }));
+
   return (
     <div>
       <h3 className="mb-4 title">View Order</h3>
+      {isError && (
+        <div className="alert alert-danger">
+          {typeof message === "string" ? message : "Unable to load order"}
+        </div>
+      )}
       <div>
-        <Table columns={columns} dataSource={data1} />
+        <Table
+          columns={columns}
+          dataSource={data1}
+          loading={isLoading}
+          locale={{ emptyText: isLoading ? "Loading order..." : "No products found in this order" }}
+        />
       </div>
     </div>
   );
