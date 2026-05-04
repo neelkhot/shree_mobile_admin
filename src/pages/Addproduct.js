@@ -156,6 +156,24 @@ const Addproduct = () => {
     { label: "Special", value: "special" },
     { label: "New Arrival", value: "new-arrival" },
   ];
+  const imageColorOptions = colorState.map((colorItem) => ({
+    value: colorItem._id,
+    label: (
+      <div className="d-flex align-items-center gap-2">
+        <span
+          style={{
+            display: "inline-block",
+            width: "18px",
+            height: "18px",
+            borderRadius: "50%",
+            backgroundColor: colorItem.title,
+            border: "1px solid #ddd",
+          }}
+        ></span>
+        <span>{colorItem.title}</span>
+      </div>
+    ),
+  }));
   const img = useMemo(() => {
     return imgState?.map((i) => ({
       public_id: i.public_id,
@@ -411,20 +429,16 @@ const Addproduct = () => {
                     style={{ top: "10px", right: "10px" }}
                   ></button>
                   <img src={i.url} alt="" width={200} height={200} />
-                  <select
-                    className="form-control mt-2"
+                  <Select
+                    className="w-100 mt-2"
+                    allowClear
+                    placeholder="Link image to color"
                     value={imageColors[i.public_id] || ""}
-                    onChange={(event) =>
-                      handleImageColorChange(i.public_id, event.target.value)
+                    onChange={(value) =>
+                      handleImageColorChange(i.public_id, value)
                     }
-                  >
-                    <option value="">Link image to color</option>
-                    {colorState.map((colorItem) => (
-                      <option key={colorItem._id} value={colorItem._id}>
-                        {colorItem.title}
-                      </option>
-                    ))}
-                  </select>
+                    options={imageColorOptions}
+                  />
                 </div>
               );
             })}
@@ -438,20 +452,16 @@ const Addproduct = () => {
                     style={{ top: "10px", right: "10px" }}
                   ></button>
                   <img src={i.url} alt="" width={200} height={200} />
-                  <select
-                    className="form-control mt-2"
+                  <Select
+                    className="w-100 mt-2"
+                    allowClear
+                    placeholder="Link image to color"
                     value={imageColors[i.public_id] || ""}
-                    onChange={(event) =>
-                      handleImageColorChange(i.public_id, event.target.value)
+                    onChange={(value) =>
+                      handleImageColorChange(i.public_id, value)
                     }
-                  >
-                    <option value="">Link image to color</option>
-                    {colorState.map((colorItem) => (
-                      <option key={colorItem._id} value={colorItem._id}>
-                        {colorItem.title}
-                      </option>
-                    ))}
-                  </select>
+                    options={imageColorOptions}
+                  />
                 </div>
               );
             })}
